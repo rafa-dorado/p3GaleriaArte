@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SALA 1 — Anatomía del Lienzo · Eonesia</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg-deep:#070b13;
+    --bg-panel:#0d1420;
+    --bg-panel-2:#111a29;
+    --line-blue:rgba(96,148,255,0.14);
+    --line-blue-strong:rgba(130,178,255,0.4);
+    --gold:#c9a961;
+    --ocre:#bb7c3d;
+    --ocre-dim:rgba(187,124,61,0.4);
+    --anil:#4a6aa5;
+    --carmin-border:#9a4a56;
+    --carmin-text:#e2929c;
+    --verde-oxido:#4f7a5c;
+    --text-main:#eef2fa;
+    --text-dim:#b7c2d9;
+    --ok:#6fbb8a;
+    --font-sans:'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono:'IBM Plex Mono', ui-monospace, monospace;
+
+    /* Escala tipográfica pactada: cuerpo >=18px, rótulos de sistema >=22px */
+    --fs-body:18px;
+    --fs-body-lg:20px;
+    --fs-label:22px;
+    --fs-title:26px;
+  }
+
+  /* -------- Tema de alto contraste (toggle en el header) -------- */
+  html.hc{
+    --bg-deep:#000000;
+    --bg-panel:#000000;
+    --bg-panel-2:#0a0a0a;
+    --line-blue:rgba(255,255,255,0.22);
+    --line-blue-strong:rgba(255,255,255,0.65);
+    --gold:#ffd85e;
+    --ocre:#ffb15e;
+    --ocre-dim:rgba(255,177,94,0.55);
+    --carmin-border:#ff6b7a;
+    --carmin-text:#ff9aa4;
+    --ok:#7CFC9E;
+    --text-main:#ffffff;
+    --text-dim:#f0f0f0;
+  }
+  html.hc .frag-thumb{ outline:1px solid rgba(255,255,255,0.4); }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg-deep);color:var(--text-main);font-family:var(--font-sans);}
+  body{
+    background-color:var(--bg-deep);
+    background-image:
+      linear-gradient(var(--line-blue) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-blue) 1px, transparent 1px);
+    background-size:26px 26px;
+    min-height:100vh;
+    font-size:var(--fs-body);
+    line-height:1.55;
+  }
+  .mono{font-family:var(--font-mono);}
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-track{background:var(--bg-panel);}
+  ::-webkit-scrollbar-thumb{background:#324162;border-radius:0;}
+  .hairline{border-color:rgba(130,178,255,0.24);}
+  html.hc .hairline{ border-color:rgba(255,255,255,0.5); }
+  .frag-thumb{ background-repeat:no-repeat; background-color:#0a1120; }
+
+  /* -------- Escala tipográfica -------- */
+  .t-body{ font-size:var(--fs-body); line-height:1.55; }
+  .t-body-lg{ font-size:var(--fs-body-lg); line-height:1.5; }
+  .t-label{ font-size:var(--fs-label); line-height:1.3; letter-spacing:0.02em; }
+  .t-title{ font-size:var(--fs-title); line-height:1.25; letter-spacing:0.02em; }
+
+  /* -------- Foco visible por teclado (obligatorio, AA) -------- */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible, textarea:focus-visible, input:focus-visible{
+    outline:3px solid var(--gold);
+    outline-offset:3px;
+  }
+  html.hc a:focus-visible, html.hc button:focus-visible, html.hc [tabindex]:focus-visible, html.hc textarea:focus-visible{
+    outline:4px solid #ffffff;
+    outline-offset:3px;
+  }
+
+  @keyframes binFlash{
+    0%,100%{ box-shadow: 0 0 0 0 rgba(201,169,97,0); }
+    50%{ box-shadow: 0 0 0 4px rgba(201,169,97,0.6), 0 0 16px 3px rgba(201,169,97,0.4); }
+  }
+  .bin-flash{ animation: binFlash 200ms ease-in-out 2; }
+  @keyframes blink-caret{ 50%{ opacity:0; } }
+  .caret{ animation: blink-caret 800ms step-end infinite; }
+  .no-select{ user-select:none; -webkit-user-select:none; }
+  .scanline-btn{
+    border:1px solid rgba(130,178,255,0.4);
+    background:linear-gradient(180deg, rgba(74,106,165,0.2), rgba(74,106,165,0.07));
+  }
+  .scanline-btn:hover{ background:linear-gradient(180deg, rgba(74,106,165,0.32), rgba(74,106,165,0.14)); }
+  .scanline-btn:disabled{ opacity:0.4; cursor:not-allowed; }
+  html.hc .scanline-btn{ border-color:rgba(255,255,255,0.6); background:rgba(255,255,255,0.06); }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; transition-duration:0.001ms !important; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/plain" id="app-source">
+/* ============================================================================
+   SALA 1 — ANATOMÍA DEL LIENZO (Pigmento Ocre)
+   "La Galería en Blanco" · Eonesia v15.1 · Pantalla independiente
+   ---------------------------------------------------------------------------
+   REVISIÓN DE ACCESIBILIDAD (esta versión corrige):
+   1) Escala tipográfica: cuerpo >=18px (--fs-body), rótulos de sistema >=22px
+      (--fs-label); nada por debajo de esos mínimos en ningún texto funcional.
+   2) Crédito de cada obra SIEMPRE como texto visible en pantalla (no solo en
+      el atributo title=, que no existe en tablet sin ratón).
+   3) :focus-visible en todo elemento interactivo + bidones y fragmentos son
+      ahora foco/teclado-operables (tabIndex, role="button", Enter/Espacio).
+   4) El contador de cada bidón es un dato funcional: usa texto principal de
+      cuerpo (18px, --text-main/--gold), no el tono decorativo tenue.
+   Además: toggle de "alto contraste" en el header (tema con negro puro,
+   blanco puro y acentos más saturados) para necesidades de contraste altas.
+   ---------------------------------------------------------------------------
+   NOTA DE IMPLEMENTACIÓN SOBRE LOS FRAGMENTOS (transparencia técnica, ya
+   señalada en la iteración anterior): el superprompt pide imágenes reales
+   embebidas en base64. Este entorno de construcción no tiene acceso de red
+   para descargar y codificar binarios, así que los fragmentos usan obras
+   reales de dominio público alojadas en Wikimedia Commons (Special:FilePath,
+   enlace estable por nombre de archivo) recortadas visualmente con
+   background-size/background-position — nunca iconos genéricos. Si el
+   paquete final necesita ser 100% offline, basta sustituir esas URLs por los
+   mismos archivos ya descargados en base64.
+   ========================================================================= */
+
+const { useState, useRef, useEffect, useCallback, useMemo } = React;
+
+/* ---------------------------------------------------------------------- */
+/* 0. DATOS: categorías, fragmentos reales, textos de sistema             */
+/* ---------------------------------------------------------------------- */
+
+const CATEGORIES = {
+  punto:   { label: 'Punto',   desc: 'Marca mínima, sin dirección definida.' },
+  linea:   { label: 'Línea',   desc: 'Recorrido con dirección; puede ser recta, curva o quebrada.' },
+  plano:   { label: 'Plano',   desc: 'Superficie delimitada, sin sugerencia de profundidad.' },
+  textura: { label: 'Textura', desc: 'Sugiere una superficie táctil (rugosa, lisa, granulada) mediante técnica pictórica.' },
+  volumen: { label: 'Volumen', desc: 'Sugiere profundidad tridimensional mediante luz y sombra (degradado).' },
+};
+const CATEGORY_ORDER_DEFAULT = ['punto', 'linea', 'plano', 'textura', 'volumen'];
+
+const IMG_VANGOGH    = 'https://commons.wikimedia.org/wiki/Special:FilePath/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg?width=1200';
+const IMG_SEURAT     = 'https://commons.wikimedia.org/wiki/Special:FilePath/Georges_Seurat_-_A_Sunday_on_La_Grande_Jatte_--_1884_-_Google_Art_Project.jpg?width=1200';
+const IMG_SEURAT_TILE= 'https://commons.wikimedia.org/wiki/Special:FilePath/Georges_Seurat_-_A_Sunday_on_La_Grande_Jatte_--_1884_-_Google_Art_Project-x0-y2.jpg?width=800';
+const IMG_KANDINSKY  = 'https://commons.wikimedia.org/wiki/Special:FilePath/Black_Lines_by_Vasily_Kandinsky,_1913.JPG?width=1200';
+const IMG_MONDRIAN   = 'https://commons.wikimedia.org/wiki/Special:FilePath/Piet_Mondriaan,_1930_-_Mondrian_Composition_II_in_Red,_Blue,_and_Yellow.jpg?width=1200';
+const IMG_MALEVICH   = 'https://commons.wikimedia.org/wiki/Special:FilePath/Black_square.jpg?width=900';
+const IMG_VERMEER    = 'https://commons.wikimedia.org/wiki/Special:FilePath/Girl_with_a_Pearl_Earring.jpg?width=1200';
+const IMG_REMBRANDT  = 'https://commons.wikimedia.org/wiki/Special:FilePath/Rembrant_Self-Portrait,_1660.jpg?width=1200';
+
+const CREDITS = {
+  [IMG_VANGOGH]:   'V. van Gogh — La noche estrellada (1889). Dominio público, Wikimedia Commons.',
+  [IMG_SEURAT]:    'G. Seurat — Tarde de domingo en la Grande Jatte (1884). Dominio público, Wikimedia Commons.',
+  [IMG_SEURAT_TILE]:'G. Seurat — Tarde de domingo en la Grande Jatte, detalle (1884). Dominio público, Wikimedia Commons.',
+  [IMG_KANDINSKY]: 'V. Kandinsky — Líneas negras (1913). Dominio público, Wikimedia Commons.',
+  [IMG_MONDRIAN]:  'P. Mondrian — Composición II en rojo, azul y amarillo (1930). Dominio público, Wikimedia Commons.',
+  [IMG_MALEVICH]:  'K. Malévich — Cuadrado negro (1915). Dominio público, Wikimedia Commons.',
+  [IMG_VERMEER]:   'J. Vermeer — La joven de la perla (h. 1665). Dominio público, Wikimedia Commons.',
+  [IMG_REMBRANDT]: 'Rembrandt van Rijn — Autorretrato (1660). Dominio público, Wikimedia Commons.',
+};
+
+// 15 fragmentos: 3 por categoría. bgSize/bgPos crean el "recorte" del fragmento
+// real sobre la obra completa (misma técnica que un visor de detalle de museo).
+const FRAGMENTS = [
+  { id: 'f01', categoria: 'punto', src: IMG_SEURAT, bgSize: '520% auto', bgPos: '36% 58%' },
+  { id: 'f02', categoria: 'punto', src: IMG_SEURAT, bgSize: '560% auto', bgPos: '64% 28%' },
+  { id: 'f03', categoria: 'punto', src: IMG_SEURAT_TILE, bgSize: '150% auto', bgPos: '50% 45%' },
+  { id: 'f04', categoria: 'linea', src: IMG_KANDINSKY, bgSize: '320% auto', bgPos: '22% 18%' },
+  { id: 'f05', categoria: 'linea', src: IMG_KANDINSKY, bgSize: '300% auto', bgPos: '72% 66%' },
+  { id: 'f06', categoria: 'linea', src: IMG_KANDINSKY, bgSize: '340% auto', bgPos: '48% 82%' },
+  { id: 'f07', categoria: 'plano', src: IMG_MONDRIAN, bgSize: '260% auto', bgPos: '28% 24%' },
+  { id: 'f08', categoria: 'plano', src: IMG_MONDRIAN, bgSize: '260% auto', bgPos: '76% 72%' },
+  { id: 'f09', categoria: 'plano', src: IMG_MALEVICH, bgSize: '175% auto', bgPos: '50% 50%' },
+  { id: 'f10', categoria: 'textura', src: IMG_VANGOGH, bgSize: '430% auto', bgPos: '28% 18%' },
+  { id: 'f11', categoria: 'textura', src: IMG_VANGOGH, bgSize: '430% auto', bgPos: '72% 76%' },
+  { id: 'f12', categoria: 'textura', src: IMG_VANGOGH, bgSize: '460% auto', bgPos: '50% 46%' },
+  { id: 'f13', categoria: 'volumen', src: IMG_VERMEER, bgSize: '260% auto', bgPos: '44% 34%' },
+  { id: 'f14', categoria: 'volumen', src: IMG_VERMEER, bgSize: '300% auto', bgPos: '60% 56%' },
+  { id: 'f15', categoria: 'volumen', src: IMG_REMBRANDT, bgSize: '250% auto', bgPos: '40% 28%' },
+].map(f => ({ ...f, credit: CREDITS[f.src] }));
+
+// Fragmento ambiguo de la Fase 3 (impasto + claroscuro: textura Y volumen a la vez)
+const AMBIGUOUS_FRAGMENT = {
+  id: 'amb01', src: IMG_REMBRANDT, bgSize: '430% auto', bgPos: '55% 20%', credit: CREDITS[IMG_REMBRANDT],
+};
+
+const SYS_TITLE = 'SALA 1 — ANATOMÍA DEL LIENZO';
+const SYS_INTRO = 'Pigmento OCRE drenado. Clasificad los fragmentos por elemento visual para iniciar la recuperación.';
+const ANOMALY_TEXT = 'NOTA TÉCNICA: composición pigmentaria del fragmento incompatible con la fecha catalogada de la obra de origen. Anomalía registrada — sin resolver.';
+
+const HINTS = {
+  planoVolumen: 'El volumen se sugiere con degradado de luz; el plano es una superficie sin profundidad. Buscad la sombra.',
+  porTema: 'No preguntéis qué representa el fragmento. Preguntad cómo está construido visualmente.',
+  binRotado: 'Los bidones han cambiado de sitio. Leed la etiqueta, no la posición de memoria.',
+  encargoUnaCategoria: 'El encargo pide dos elementos distintos combinados. Revisad qué categorías tenéis en el lienzo.',
+  encargoPocosFragmentos: 'Ya tenéis las dos categorías que pide el encargo: textura y volumen. Lo que falla es la cantidad — el encargo pide componer con 3 o 4 fragmentos, ni menos ni más. Ajustad cuántos hay en el lienzo y volved a intentarlo.',
+  encargoAmontonado: 'Un restaurador también compone con intención. Dejad que cada fragmento respire en el lienzo.',
+};
+
+/* ---------------------------------------------------------------------- */
+/* 1. UTILIDADES: estado por URL, motion, easing, sonido                  */
+/* ---------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------- */
+/* 1. UTILIDADES: código corto de sala (sin URL, sin servidor), motion    */
+/* ---------------------------------------------------------------------- */
+
+// Sistema de código corto entre salas: cada sala termina con un código de
+// 4 caracteres (letra de sala + dígito de dificultad + letra de bandera +
+// letra de comprobación) que el alumno anota a mano y teclea en la
+// siguiente pantalla que lo pida. Nada de URLs, nada de profesorado.
+function encodeRoomCode(roomLetter, fallos, flagBool) {
+  const f = Math.max(0, Math.min(9, Math.round(fallos)));
+  const flagChar = flagBool ? 'S' : 'N';
+  const sum = roomLetter.charCodeAt(0) + String(f).charCodeAt(0) * 3 + flagChar.charCodeAt(0) * 7;
+  const checksum = String.fromCharCode(65 + (sum % 26));
+  return `${roomLetter}${f}${flagChar}${checksum}`;
+}
+function decodeRoomCode(code, expectedRoomLetter) {
+  if (!code) return null;
+  const c = code.trim().toUpperCase();
+  if (c.length !== 4) return null;
+  const roomLetter = c[0], fallosChar = c[1], flagChar = c[2], checksumChar = c[3];
+  if (expectedRoomLetter && roomLetter !== expectedRoomLetter) return null;
+  if (!/[0-9]/.test(fallosChar)) return null;
+  if (flagChar !== 'S' && flagChar !== 'N') return null;
+  const sum = roomLetter.charCodeAt(0) + fallosChar.charCodeAt(0) * 3 + flagChar.charCodeAt(0) * 7;
+  const expectedChecksum = String.fromCharCode(65 + (sum % 26));
+  if (checksumChar !== expectedChecksum) return null;
+  return { roomLetter, fallos: parseInt(fallosChar, 10), flag: flagChar === 'S' };
+}
+
+const REDUCE_MOTION = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const DUR = {
+  snap: REDUCE_MOTION ? 1 : 250,
+  back: REDUCE_MOTION ? 1 : 300,
+  binRotate: REDUCE_MOTION ? 1 : 400,
+  typewriter: REDUCE_MOTION ? 0 : 30,
+};
+
+function shuffleOrder(order) {
+  let arr = order.slice();
+  for (let attempt = 0; attempt < 10; attempt++) {
+    arr = order.slice();
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    if (arr.every((c, i) => c !== order[i])) break;
+  }
+  return arr;
+}
+
+function useAudio(muted) {
+  const ctxRef = useRef(null);
+  const ensureCtx = useCallback(() => {
+    if (!ctxRef.current) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) ctxRef.current = new AC();
+    }
+    if (ctxRef.current && ctxRef.current.state === 'suspended') ctxRef.current.resume();
+    return ctxRef.current;
+  }, []);
+  const playTone = useCallback((freqStart, freqEnd, durMs, type) => {
+    if (muted) return;
+    const ctx = ensureCtx();
+    if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    const t0 = ctx.currentTime;
+    osc.frequency.setValueAtTime(freqStart, t0);
+    if (freqEnd !== freqStart) osc.frequency.linearRampToValueAtTime(freqEnd, t0 + durMs / 1000);
+    gain.gain.setValueAtTime(0.16, t0);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + durMs / 1000);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(t0); osc.stop(t0 + durMs / 1000 + 0.03);
+  }, [muted, ensureCtx]);
+  const playCorrect = useCallback(() => playTone(440, 660, 120, 'sine'), [playTone]);
+  const playIncorrect = useCallback(() => playTone(180, 180, 200, 'square'), [playTone]);
+  return { playCorrect, playIncorrect, ensureCtx };
+}
+
+function onKeyActivate(fn) {
+  return function (e) {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault();
+      fn();
+    }
+  };
+}
+
+/* ---------------------------------------------------------------------- */
+/* 2. COMPONENTES DE PRESENTACIÓN                                         */
+/* ---------------------------------------------------------------------- */
+
+function FragmentFace({ frag }) {
+  return React.createElement('div', {
+    className: 'frag-thumb w-full h-full',
+    style: { backgroundImage: `url(${frag.src})`, backgroundSize: frag.bgSize, backgroundPosition: frag.bgPos },
+  });
+}
+
+function ConsoleHeader({ muted, onToggleMute, highContrast, onToggleContrast, equipo }) {
+  return React.createElement('div', { className: 'flex flex-wrap items-center justify-between gap-3 px-4 sm:px-6 py-3 border-b hairline bg-[var(--bg-panel)]/90 backdrop-blur sticky top-0 z-40' },
+    React.createElement('div', { className: 'flex items-center gap-3 flex-wrap' },
+      React.createElement('span', { className: 'mono t-body font-semibold text-[var(--ocre)] border border-[var(--ocre-dim)] px-2 py-1' }, 'EONESIA v15.1'),
+      React.createElement('h1', { className: 'mono t-title text-[var(--text-main)]' }, SYS_TITLE),
+    ),
+    React.createElement('div', { className: 'flex items-center gap-3 flex-wrap' },
+      React.createElement('span', { className: 'mono t-body text-[var(--text-dim)] hidden sm:inline' }, equipo),
+      React.createElement('button', {
+        onClick: onToggleContrast,
+        className: 'mono t-body px-3 py-2 border hairline scanline-btn',
+        'aria-pressed': highContrast,
+      }, highContrast ? '◐ contraste alto: ON' : '◐ alto contraste'),
+      React.createElement('button', {
+        onClick: onToggleMute,
+        className: 'mono t-body px-3 py-2 border hairline scanline-btn',
+        'aria-pressed': muted,
+        'aria-label': muted ? 'Activar sonido' : 'Silenciar sonido',
+      }, muted ? '🔇 sonido' : '🔊 sonido')
+    )
+  );
+}
+
+function PhaseTracker({ phase }) {
+  const steps = [
+    { n: 1, label: 'Identificar' },
+    { n: 2, label: 'Aplicar' },
+    { n: 3, label: 'Criterio' },
+  ];
+  return React.createElement('div', { className: 'flex items-center gap-3 flex-wrap mono t-label text-[var(--text-dim)] px-4 sm:px-6 py-3 border-b hairline' },
+    steps.map((s, i) => React.createElement(React.Fragment, { key: s.n },
+      React.createElement('span', {
+        className: 'px-2 py-1 border ' + (phase === s.n ? 'text-[var(--gold)] border-[var(--gold)]/70 bg-[var(--gold)]/10' : 'border-transparent'),
+      }, `FASE ${s.n} · ${s.label}`),
+      i < steps.length - 1 ? React.createElement('span', { className: 'text-[var(--text-dim)]', 'aria-hidden': 'true' }, '—') : null
+    ))
+  );
+}
+
+function DossierPanel({ open, onClose }) {
+  if (!open) return null;
+  return React.createElement('div', { className: 'fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4', onClick: onClose },
+    React.createElement('div', {
+      className: 'bg-[var(--bg-panel)] border hairline max-w-xl w-full p-6',
+      onClick: e => e.stopPropagation(),
+      role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Dossier de elementos',
+    },
+      React.createElement('div', { className: 'flex items-center justify-between mb-4' },
+        React.createElement('h2', { className: 'mono t-label text-[var(--gold)]' }, 'DOSSIER DE ELEMENTOS'),
+        React.createElement('button', { onClick: onClose, className: 'mono t-body px-2 py-1 text-[var(--text-dim)] hover:text-[var(--text-main)]' }, '✕ cerrar')
+      ),
+      React.createElement('table', { className: 'w-full' },
+        React.createElement('tbody', null,
+          CATEGORY_ORDER_DEFAULT.map(key => React.createElement('tr', { key, className: 'border-t hairline align-top' },
+            React.createElement('td', { className: 'py-3 pr-4 mono t-label text-[var(--gold)] w-32' }, CATEGORIES[key].label),
+            React.createElement('td', { className: 'py-3 t-body text-[var(--text-dim)]' }, CATEGORIES[key].desc)
+          ))
+        )
+      )
+    )
+  );
+}
+
+function HintBar({ text, onDismiss }) {
+  if (!text) return null;
+  return React.createElement('div', { className: 'fixed bottom-4 left-4 right-4 sm:right-auto sm:max-w-lg z-40', role: 'status' },
+    React.createElement('div', { className: 'bg-[var(--bg-panel-2)] border border-[var(--ocre-dim)] px-4 py-3 flex items-start gap-3 shadow-lg' },
+      React.createElement('span', { 'aria-hidden': 'true', className: 't-label' }, '💡'),
+      React.createElement('p', { className: 'mono t-body text-[var(--text-main)] flex-1' }, text),
+      React.createElement('button', { onClick: onDismiss, className: 'mono t-body px-2 text-[var(--text-dim)] hover:text-[var(--text-main)]', 'aria-label': 'Cerrar pista' }, '✕')
+    )
+  );
+}
+
+function CreditsLegend({ title, items }) {
+  return React.createElement('div', { className: 'border hairline bg-[var(--bg-panel)] p-4' },
+    React.createElement('p', { className: 'mono t-body font-semibold text-[var(--text-dim)] mb-2' }, title),
+    React.createElement('ul', { className: 't-body text-[var(--text-dim)] space-y-1' },
+      items.map((c, i) => React.createElement('li', { key: i }, c))
+    )
+  );
+}
+
+/* ---------------------------------------------------------------------- */
+/* 3. APP PRINCIPAL                                                       */
+/* ---------------------------------------------------------------------- */
+
+function App() {
+  const [equipo] = useState('Comité de restauración');
+  const [ayudasUsadas, setAyudasUsadas] = useState(0);
+  const [muted, setMuted] = useState(false);
+  const [highContrast, setHighContrast] = useState(false);
+  const audio = useAudio(muted);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('hc', highContrast);
+  }, [highContrast]);
+
+  const [introDone, setIntroDone] = useState(false);
+  const [phase, setPhase] = useState(1);
+  const [dossierOpen, setDossierOpen] = useState(false);
+  const [hint, setHint] = useState(null);
+
+  /* ---------------- FASE 1: identificar ---------------- */
+  const [fragments, setFragments] = useState(() => FRAGMENTS.map(f => ({ ...f, classified: false })));
+  const [binOrder, setBinOrder] = useState(CATEGORY_ORDER_DEFAULT.slice());
+  const [prevBinOrder, setPrevBinOrder] = useState(CATEGORY_ORDER_DEFAULT.slice());
+  const [classifiedSinceRotation, setClassifiedSinceRotation] = useState(0);
+  const [rotationThreshold, setRotationThreshold] = useState(() => 4 + Math.round(Math.random()));
+  const [selectedFragId, setSelectedFragId] = useState(null);
+
+  const binRefs = useRef({});
+  const trayRefs = useRef({});
+  const [ghost, setGhost] = useState(null);
+  const dragInfo = useRef(null);
+
+  const totalClassified = fragments.filter(f => f.classified).length;
+  const phase1Complete = totalClassified === fragments.length;
+
+  function showHint(text) {
+    setHint(text);
+    setAyudasUsadas(a => a + 1);
+  }
+
+  function getBinAtPoint(x, y) {
+    for (const cat of Object.keys(binRefs.current)) {
+      const el = binRefs.current[cat];
+      if (!el) continue;
+      const r = el.getBoundingClientRect();
+      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return cat;
+    }
+    return null;
+  }
+
+  function triggerBinRotation() {
+    const oldOrder = binOrder.slice();
+    const newOrder = shuffleOrder(oldOrder);
+    const oldRects = {};
+    oldOrder.forEach(cat => {
+      const el = binRefs.current[cat];
+      if (el) oldRects[cat] = el.getBoundingClientRect();
+    });
+    setPrevBinOrder(oldOrder);
+    setBinOrder(newOrder);
+    requestAnimationFrame(() => {
+      newOrder.forEach(cat => {
+        const el = binRefs.current[cat];
+        if (!el || !oldRects[cat]) return;
+        const newRect = el.getBoundingClientRect();
+        const delta = oldRects[cat].left - newRect.left;
+        if (Math.abs(delta) > 0.5) {
+          el.style.transition = 'none';
+          el.style.transform = `translateX(${delta}px)`;
+          el.classList.add('bin-flash');
+          requestAnimationFrame(() => {
+            el.style.transition = `transform ${DUR.binRotate}ms ease-in-out`;
+            el.style.transform = 'translateX(0px)';
+          });
+          setTimeout(() => { el.classList.remove('bin-flash'); }, DUR.binRotate);
+        }
+      });
+    });
+  }
+
+  function finalizeSuccess(fragId) {
+    setFragments(prev => prev.map(f => f.id === fragId ? { ...f, classified: true } : f));
+    setGhost(null);
+    setClassifiedSinceRotation(n => {
+      const next = n + 1;
+      if (next >= rotationThreshold) {
+        triggerBinRotation();
+        setRotationThreshold(4 + Math.round(Math.random()));
+        return 0;
+      }
+      return next;
+    });
+  }
+
+  function attemptClassifyPhase1(fragId, originRect, dropCategory) {
+    const frag = fragments.find(f => f.id === fragId);
+    if (!frag || frag.classified) return;
+
+    if (dropCategory && dropCategory === frag.categoria) {
+      audio.playCorrect();
+      const binEl = binRefs.current[dropCategory];
+      const br = binEl ? binEl.getBoundingClientRect() : originRect;
+      const w = originRect.width, h = originRect.height;
+      setGhost({ frag, style: { position: 'fixed', left: originRect.left, top: originRect.top, width: w, height: h, transform: 'scale(1)', transition: 'none', zIndex: 60 } });
+      requestAnimationFrame(() => {
+        setGhost(g => g ? { ...g, style: { ...g.style,
+          left: br.left + br.width / 2 - (w * 0.7) / 2,
+          top: br.top + br.height / 2 - (h * 0.7) / 2,
+          transform: 'scale(0.7)',
+          transition: `left ${DUR.snap}ms cubic-bezier(0.34,1.56,0.64,1), top ${DUR.snap}ms cubic-bezier(0.34,1.56,0.64,1), transform ${DUR.snap}ms cubic-bezier(0.34,1.56,0.64,1)`,
+        } } : g);
+      });
+      setTimeout(() => finalizeSuccess(fragId), DUR.snap + 20);
+    } else if (dropCategory) {
+      audio.playIncorrect();
+      const droppedSlot = binOrder.indexOf(dropCategory);
+      const usedToBeHere = prevBinOrder[droppedSlot] === frag.categoria && prevBinOrder[droppedSlot] !== binOrder[droppedSlot];
+      if ((dropCategory === 'plano' && frag.categoria === 'volumen') || (dropCategory === 'volumen' && frag.categoria === 'plano')) {
+        showHint(HINTS.planoVolumen);
+      } else if (usedToBeHere) {
+        showHint(HINTS.binRotado);
+      } else {
+        showHint(HINTS.porTema);
+      }
+      setGhost({ frag, style: { position: 'fixed', left: originRect.left, top: originRect.top, width: originRect.width, height: originRect.height, transform: 'scale(1)', transition: 'none', zIndex: 60 } });
+      requestAnimationFrame(() => {
+        setGhost(g => g ? { ...g, style: { ...g.style, transition: `left ${DUR.back}ms ease-out, top ${DUR.back}ms ease-out, transform ${DUR.back}ms ease-out` } } : g);
+      });
+      setTimeout(() => setGhost(null), DUR.back + 20);
+    } else {
+      setGhost({ frag, style: { position: 'fixed', left: originRect.left, top: originRect.top, width: originRect.width, height: originRect.height, transform: 'scale(1)', transition: 'none', zIndex: 60 } });
+      requestAnimationFrame(() => {
+        setGhost(g => g ? { ...g, style: { ...g.style, transition: `left ${DUR.back}ms ease-out, top ${DUR.back}ms ease-out` } } : g);
+      });
+      setTimeout(() => setGhost(null), DUR.back + 20);
+    }
+  }
+
+  function onFragPointerDown(e, frag) {
+    if (frag.classified) return;
+    const el = trayRefs.current[frag.id];
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const offsetX = e.clientX - rect.left;
+    const offsetY = e.clientY - rect.top;
+    dragInfo.current = { fragId: frag.id, offsetX, offsetY, originRect: rect, startX: e.clientX, startY: e.clientY, moved: false };
+    window.addEventListener('pointermove', onWindowPointerMove);
+    window.addEventListener('pointerup', onWindowPointerUp, { once: true });
+  }
+
+  function onWindowPointerMove(e) {
+    const info = dragInfo.current;
+    if (!info) return;
+    if (!info.moved) {
+      const dist = Math.hypot(e.clientX - info.startX, e.clientY - info.startY);
+      if (dist < 4) return;
+      info.moved = true;
+      setSelectedFragId(null);
+      setGhost({
+        frag: fragments.find(f => f.id === info.fragId),
+        style: { position: 'fixed', left: info.originRect.left, top: info.originRect.top, width: info.originRect.width, height: info.originRect.height, transform: 'scale(1)', transition: 'none', zIndex: 60 },
+      });
+    }
+    setGhost(g => g ? { ...g, style: { ...g.style, left: e.clientX - info.offsetX, top: e.clientY - info.offsetY, transition: 'none' } } : g);
+  }
+
+  function onWindowPointerUp(e) {
+    window.removeEventListener('pointermove', onWindowPointerMove);
+    const info = dragInfo.current;
+    dragInfo.current = null;
+    if (!info || !info.moved) return;
+    const cat = getBinAtPoint(e.clientX, e.clientY);
+    attemptClassifyPhase1(info.fragId, info.originRect, cat);
+  }
+
+  function onFragClick(frag) {
+    if (frag.classified) return;
+    setSelectedFragId(id => id === frag.id ? null : frag.id);
+  }
+  function onBinClick(cat) {
+    if (!selectedFragId) return;
+    const frag = fragments.find(f => f.id === selectedFragId);
+    const el = trayRefs.current[selectedFragId];
+    setSelectedFragId(null);
+    if (!frag || !el) return;
+    const rect = el.getBoundingClientRect();
+    attemptClassifyPhase1(frag.id, rect, cat);
+  }
+
+  /* ---------------- FASE 2: aplicar (composición dirigida) ---------------- */
+  const [canvasItems, setCanvasItems] = useState([]);
+  const zCounter = useRef(1);
+  const canvasRef = useRef(null);
+  const canvasDrag = useRef(null);
+  const [phase2Hint, setPhase2Hint] = useState(null);
+
+  const categoriesOnCanvas = useMemo(() => {
+    const set = new Set(canvasItems.map(ci => {
+      const f = fragments.find(fr => fr.id === ci.fragId);
+      return f ? f.categoria : null;
+    }).filter(Boolean));
+    return set;
+  }, [canvasItems, fragments]);
+
+  const encargoSatisfecho = canvasItems.length >= 3 && canvasItems.length <= 4 &&
+    categoriesOnCanvas.has('textura') && categoriesOnCanvas.has('volumen');
+
+  function groupedByCategory() {
+    const groups = {};
+    CATEGORY_ORDER_DEFAULT.forEach(c => { groups[c] = []; });
+    fragments.forEach(f => { groups[f.categoria].push(f); });
+    return groups;
+  }
+
+  function placeOnCanvasAt(fragId, x, y) {
+    const uid = 'ci-' + Math.random().toString(36).slice(2, 9);
+    setCanvasItems(prev => [...prev, { uid, fragId, x, y, z: zCounter.current++ }]);
+  }
+
+  function onPanelFragClick(frag) {
+    // fallback accesible (teclado / sin arrastre): coloca en cascada
+    const n = canvasItems.length;
+    placeOnCanvasAt(frag.id, 24 + (n % 4) * 46, 24 + Math.floor(n / 4) * 46);
+  }
+
+  function onPanelFragPointerDown(e, frag) {
+    const el = trayRefs.current['panel-' + frag.id];
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    canvasDrag.current = { fragId: frag.id, offsetX: e.clientX - rect.left, offsetY: e.clientY - rect.top, originRect: rect, startX: e.clientX, startY: e.clientY, moved: false };
+    window.addEventListener('pointermove', onPanelPointerMove);
+    window.addEventListener('pointerup', onPanelPointerUp, { once: true });
+  }
+  function onPanelPointerMove(e) {
+    const info = canvasDrag.current;
+    if (!info) return;
+    if (!info.moved) {
+      const dist = Math.hypot(e.clientX - info.startX, e.clientY - info.startY);
+      if (dist < 4) return;
+      info.moved = true;
+      setGhost({ frag: fragments.find(f => f.id === info.fragId), style: { position: 'fixed', left: info.originRect.left, top: info.originRect.top, width: info.originRect.width, height: info.originRect.height, transform: 'scale(1)', transition: 'none', zIndex: 60 } });
+    }
+    setGhost(g => g ? { ...g, style: { ...g.style, left: e.clientX - info.offsetX, top: e.clientY - info.offsetY, transition: 'none' } } : g);
+  }
+  function onPanelPointerUp(e) {
+    window.removeEventListener('pointermove', onPanelPointerMove);
+    const info = canvasDrag.current;
+    canvasDrag.current = null;
+    if (!info || !info.moved) return;
+    const cRect = canvasRef.current ? canvasRef.current.getBoundingClientRect() : null;
+    const inside = cRect && e.clientX >= cRect.left && e.clientX <= cRect.right && e.clientY >= cRect.top && e.clientY <= cRect.bottom;
+    if (inside && cRect) {
+      placeOnCanvasAt(info.fragId, e.clientX - cRect.left - 55, e.clientY - cRect.top - 55);
+      setGhost(null);
+    } else {
+      setGhost(g => g ? { ...g, style: { ...g.style, left: info.originRect.left, top: info.originRect.top, transition: `left ${DUR.back}ms ease-out, top ${DUR.back}ms ease-out` } } : g);
+      setTimeout(() => setGhost(null), DUR.back + 20);
+    }
+  }
+
+  function onCanvasItemPointerDown(e, item) {
+    e.stopPropagation();
+    const cRect = canvasRef.current.getBoundingClientRect();
+    const offsetX = e.clientX - (cRect.left + item.x);
+    const offsetY = e.clientY - (cRect.top + item.y);
+    setCanvasItems(prev => prev.map(ci => ci.uid === item.uid ? { ...ci, z: zCounter.current++ } : ci));
+    function move(ev) {
+      const nx = ev.clientX - cRect.left - offsetX;
+      const ny = ev.clientY - cRect.top - offsetY;
+      setCanvasItems(prev => prev.map(ci => ci.uid === item.uid ? { ...ci, x: nx, y: ny } : ci));
+    }
+    function up() {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    }
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  }
+
+  function tryAdvancePhase2() {
+    const tieneCategorias = categoriesOnCanvas.has('textura') && categoriesOnCanvas.has('volumen');
+    if (!tieneCategorias) {
+      setPhase2Hint(HINTS.encargoUnaCategoria);
+      setAyudasUsadas(a => a + 1);
+      return;
+    }
+    if (canvasItems.length >= 2) {
+      let allClose = true;
+      for (let i = 0; i < canvasItems.length; i++) {
+        for (let j = i + 1; j < canvasItems.length; j++) {
+          const dx = canvasItems[i].x - canvasItems[j].x;
+          const dy = canvasItems[i].y - canvasItems[j].y;
+          if (Math.sqrt(dx * dx + dy * dy) > 34) allClose = false;
+        }
+      }
+      if (allClose) {
+        setPhase2Hint(HINTS.encargoAmontonado);
+        setAyudasUsadas(a => a + 1);
+        return;
+      }
+    }
+    if (canvasItems.length < 3 || canvasItems.length > 4) {
+      setPhase2Hint(HINTS.encargoPocosFragmentos);
+      setAyudasUsadas(a => a + 1);
+      return;
+    }
+    if (encargoSatisfecho) {
+      setPhase2Hint(null);
+      setPhase(3);
+    } else {
+      setPhase2Hint(HINTS.encargoUnaCategoria);
+      setAyudasUsadas(a => a + 1);
+    }
+  }
+
+  /* ---------------- FASE 3: criterio ---------------- */
+  const [ambiguousChoice, setAmbiguousChoice] = useState(null);
+  const [notaCriterio, setNotaCriterio] = useState('');
+  const [notaEnviada, setNotaEnviada] = useState(false);
+  const [anomaliaVisible, setAnomaliaVisible] = useState(false);
+  const [anomaliaTexto, setAnomaliaTexto] = useState('');
+  const [anomaliaP3, setAnomaliaP3] = useState(false);
+
+  function enviarNota() {
+    if (!ambiguousChoice) return;
+    setNotaEnviada(true);
+    setTimeout(() => {
+      setAnomaliaVisible(true);
+      setAnomaliaP3(true);
+      if (DUR.typewriter === 0) { setAnomaliaTexto(ANOMALY_TEXT); return; }
+      let i = 0;
+      const interval = setInterval(() => {
+        i++;
+        setAnomaliaTexto(ANOMALY_TEXT.slice(0, i));
+        if (i >= ANOMALY_TEXT.length) clearInterval(interval);
+      }, DUR.typewriter);
+    }, 650);
+  }
+
+  const codigoSala = useMemo(
+    () => encodeRoomCode('O', ayudasUsadas, anomaliaP3),
+    [ayudasUsadas, anomaliaP3]
+  );
+  const [codigoCopiado, setCodigoCopiado] = useState(false);
+  function copiarCodigo() {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(codigoSala).then(() => { setCodigoCopiado(true); setTimeout(() => setCodigoCopiado(false), 2000); });
+    }
+  }
+
+  const allDistinctCredits = useMemo(() => Array.from(new Set(FRAGMENTS.map(f => f.credit))), []);
+
+  /* ---------------------------------------------------------------------- */
+  /* RENDER                                                                  */
+  /* ---------------------------------------------------------------------- */
+
+  if (!introDone) {
+    return React.createElement('div', { className: 'min-h-screen flex items-center justify-center p-6' },
+      React.createElement('div', { className: 'max-w-xl w-full border hairline bg-[var(--bg-panel)] p-6 sm:p-8' },
+        React.createElement('svg', { viewBox: '0 0 400 120', className: 'w-full h-28 mb-5', 'aria-hidden': 'true' },
+          React.createElement('rect', { x: 1, y: 1, width: 398, height: 118, fill: 'none', stroke: 'var(--line-blue-strong)', strokeWidth: 1 }),
+          [0, 1, 2, 3, 4].map(i => React.createElement('g', { key: i },
+            React.createElement('rect', { x: 30 + i * 70, y: 55, width: 34, height: 46, rx: 2, fill: 'none', stroke: 'var(--anil)', strokeWidth: 1.4 }),
+            React.createElement('ellipse', { cx: 30 + i * 70 + 17, cy: 55, rx: 17, ry: 5, fill: 'none', stroke: 'var(--anil)', strokeWidth: 1.4 }),
+          )),
+          React.createElement('rect', { x: 40, y: 18, width: 260, height: 22, fill: 'none', stroke: 'var(--ocre)', strokeWidth: 1.2, strokeDasharray: '3,2' }),
+          React.createElement('text', { x: 50, y: 33, fill: 'var(--ocre)', fontSize: 11, fontFamily: 'monospace' }, 'BANDEJA · FRAGMENTOS SIN CLASIFICAR')
+        ),
+        React.createElement('p', { className: 'mono t-label text-[var(--ocre)] mb-3' }, SYS_TITLE),
+        React.createElement('p', { className: 't-body text-[var(--text-dim)] mb-6' }, SYS_INTRO),
+        React.createElement('button', {
+          className: 'mono t-body px-5 py-3 border scanline-btn text-[var(--text-main)]',
+          onClick: () => setIntroDone(true),
+        }, 'INICIAR RECUPERACIÓN →')
+      )
+    );
+  }
+
+  return React.createElement('div', { className: 'min-h-screen pb-24' },
+    React.createElement(ConsoleHeader, { muted, onToggleMute: () => setMuted(m => !m), highContrast, onToggleContrast: () => setHighContrast(h => !h), equipo }),
+    React.createElement(PhaseTracker, { phase }),
+
+    ghost && React.createElement('div', { style: ghost.style, className: 'pointer-events-none border-2 border-[var(--gold)]/60' },
+      React.createElement(FragmentFace, { frag: ghost.frag })
+    ),
+
+    React.createElement(DossierPanel, { open: dossierOpen, onClose: () => setDossierOpen(false) }),
+    React.createElement(HintBar, { text: hint || phase2Hint, onDismiss: () => { setHint(null); setPhase2Hint(null); } }),
+
+    phase === 1 && React.createElement('div', { className: 'max-w-5xl mx-auto px-4 sm:px-6 py-6' },
+      React.createElement('div', { className: 'flex items-center justify-between flex-wrap gap-3 mb-5' },
+        React.createElement('p', { className: 'mono t-body text-[var(--text-main)] font-semibold' },
+          `Fragmentos clasificados: ${totalClassified} / ${fragments.length}`),
+        React.createElement('button', { className: 'mono t-body px-3 py-2 border hairline scanline-btn', onClick: () => setDossierOpen(true) }, '📖 dossier de elementos')
+      ),
+
+      React.createElement('div', { className: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-10' },
+        fragments.filter(f => !f.classified).map(f => React.createElement('div', {
+          key: f.id,
+          ref: el => { trayRefs.current[f.id] = el; },
+          tabIndex: 0,
+          role: 'button',
+          'aria-label': `Fragmento de ${CATEGORIES[f.categoria] ? '' : ''}${f.credit}. Pulsa para seleccionarlo y luego pulsa un bidón para clasificarlo.`,
+          onKeyDown: onKeyActivate(() => onFragClick(f)),
+          className: 'border overflow-hidden cursor-grab active:cursor-grabbing hairline no-select flex flex-col bg-[var(--bg-panel)] ' + (selectedFragId === f.id ? 'ring-4 ring-[var(--gold)]' : ''),
+          onPointerDown: e => onFragPointerDown(e, f),
+          onClick: () => onFragClick(f),
+        },
+          React.createElement('div', { className: 'aspect-square w-full' }, React.createElement(FragmentFace, { frag: f })),
+          React.createElement('p', { className: 't-body text-[var(--text-dim)] px-3 py-3 leading-snug' }, f.credit)
+        )),
+      ),
+
+      React.createElement('div', { className: 'grid grid-cols-1 sm:grid-cols-5 gap-3 sm:gap-4' },
+        binOrder.map(cat => React.createElement('div', {
+          key: cat,
+          ref: el => { binRefs.current[cat] = el; },
+          tabIndex: 0,
+          role: 'button',
+          'aria-label': `Bidón ${CATEGORIES[cat].label}. ${fragments.filter(f => f.classified && f.categoria === cat).length} fragmentos clasificados aquí.`,
+          onKeyDown: onKeyActivate(() => onBinClick(cat)),
+          onClick: () => onBinClick(cat),
+          className: 'min-h-[120px] sm:min-h-[150px] border-2 border-dashed hairline flex flex-col items-center justify-center px-2 py-3 bg-[var(--bg-panel)]/70 cursor-pointer text-center',
+        },
+          React.createElement('span', { className: 'mono t-label text-[var(--gold)]' }, CATEGORIES[cat].label),
+          React.createElement('span', { className: 'mono t-body text-[var(--text-main)] mt-2' },
+            `${fragments.filter(f => f.classified && f.categoria === cat).length} clasificados`)
+        ))
+      ),
+
+      React.createElement('p', { className: 'mono t-body text-[var(--text-dim)] mt-4' }, 'Arrastrad cada fragmento a su bidón (o seleccionadlo con teclado y pulsad un bidón). Los bidones rotan de posición cada 4–5 aciertos.'),
+
+      phase1Complete && React.createElement('div', { className: 'mt-8 flex justify-end' },
+        React.createElement('button', {
+          className: 'mono t-body font-semibold px-5 py-3 border scanline-btn',
+          onClick: () => setPhase(2),
+        }, 'CONTINUAR → FASE 2 · APLICAR')
+      )
+    ),
+
+    phase === 2 && React.createElement('div', { className: 'max-w-5xl mx-auto px-4 sm:px-6 py-6' },
+      React.createElement('div', { className: 'border border-[var(--ocre-dim)] bg-[var(--bg-panel)] px-4 py-4 mb-6' },
+        React.createElement('p', { className: 'mono t-label text-[var(--ocre)] mb-2' }, 'ENCARGO DEL TALLER'),
+        React.createElement('p', { className: 't-body text-[var(--text-main)]' }, 'Componed una miniatura que combine textura dominante y al menos un elemento de volumen.'),
+        React.createElement('p', { className: 't-body text-[var(--text-dim)] mt-2' }, 'Superponed entre 3 y 4 fragmentos en total — ni un collage con dos piezas sueltas, ni un amontonamiento de toda la bandeja.')
+      ),
+      React.createElement('div', { className: 'grid grid-cols-1 md:grid-cols-4 gap-5' },
+        React.createElement('div', { ref: canvasRef, className: 'md:col-span-3 relative border hairline bg-[#0a0f1a] aspect-[4/3] overflow-hidden' },
+          canvasItems.map(item => {
+            const f = fragments.find(fr => fr.id === item.fragId);
+            if (!f) return null;
+            return React.createElement('div', {
+              key: item.uid,
+              onPointerDown: e => onCanvasItemPointerDown(e, item),
+              style: { position: 'absolute', left: item.x, top: item.y, width: 110, height: 110, zIndex: item.z },
+              className: 'border-2 border-[var(--gold)]/40 cursor-move shadow-lg',
+            }, React.createElement(FragmentFace, { frag: f }));
+          }),
+          canvasItems.length === 0 && React.createElement('p', { className: 'absolute inset-0 flex items-center justify-center t-body text-[var(--text-dim)] text-center px-6' }, 'Lienzo en blanco — arrastrad fragmentos aquí')
+        ),
+        React.createElement('div', { className: 'md:col-span-1 flex flex-col gap-4' },
+          React.createElement('div', { className: 'border hairline bg-[var(--bg-panel)] p-4' },
+            React.createElement('p', { className: 'mono t-body font-semibold text-[var(--text-dim)] mb-2' }, 'CATEGORÍAS DEL ENCARGO'),
+            ['textura', 'volumen'].map(cat => React.createElement('div', { key: cat, className: 'flex items-center justify-between t-body py-1' },
+              React.createElement('span', { className: categoriesOnCanvas.has(cat) ? 'text-[var(--ok)] font-semibold' : 'text-[var(--text-dim)]' }, CATEGORIES[cat].label),
+              React.createElement('span', { className: categoriesOnCanvas.has(cat) ? 'text-[var(--ok)] font-semibold' : 'text-[var(--text-dim)]' }, categoriesOnCanvas.has(cat) ? '✓ presente' : 'pendiente')
+            ))
+          ),
+          React.createElement('div', { className: 'border hairline bg-[var(--bg-panel)] p-4 max-h-72 overflow-y-auto' },
+            React.createElement('p', { className: 'mono t-body font-semibold text-[var(--text-dim)] mb-3' }, 'PANEL LATERAL · FRAGMENTOS'),
+            Object.entries(groupedByCategory()).map(([cat, list]) => React.createElement('div', { key: cat, className: 'mb-3' },
+              React.createElement('p', { className: 'mono t-body text-[var(--gold)] mb-2' }, CATEGORIES[cat].label),
+              React.createElement('div', { className: 'grid grid-cols-3 gap-2' },
+                list.map(f => React.createElement('div', {
+                  key: f.id,
+                  ref: el => { trayRefs.current['panel-' + f.id] = el; },
+                  tabIndex: 0,
+                  role: 'button',
+                  'aria-label': `Añadir al lienzo: ${f.credit}`,
+                  onKeyDown: onKeyActivate(() => onPanelFragClick(f)),
+                  onClick: () => onPanelFragClick(f),
+                  onPointerDown: e => onPanelFragPointerDown(e, f),
+                  className: 'w-16 h-16 border hairline cursor-grab active:cursor-grabbing overflow-hidden',
+                }, React.createElement(FragmentFace, { frag: f })))
+              )
+            ))
+          ),
+          React.createElement(CreditsLegend, { title: 'FUENTES DE LAS OBRAS (dominio público)', items: allDistinctCredits }),
+          React.createElement('button', {
+            className: 'mono t-body font-semibold px-4 py-3 border scanline-btn',
+            onClick: tryAdvancePhase2,
+          }, 'CONTINUAR → FASE 3 · CRITERIO')
+        )
+      )
+    ),
+
+    phase === 3 && React.createElement('div', { className: 'max-w-3xl mx-auto px-4 sm:px-6 py-6' },
+      !anomaliaVisible && React.createElement('div', null,
+        React.createElement('p', { className: 'mono t-label text-[var(--ocre)] mb-4' }, 'FRAGMENTO AMBIGUO — FICHA TÉCNICA'),
+        React.createElement('div', { className: 'flex flex-col sm:flex-row gap-6 mb-6' },
+          React.createElement('div', { className: 'w-48 h-48 border hairline overflow-hidden flex-shrink-0' },
+            React.createElement(FragmentFace, { frag: AMBIGUOUS_FRAGMENT })
+          ),
+          React.createElement('div', { className: 't-body text-[var(--text-dim)]' },
+            React.createElement('p', null, 'Este fragmento podría clasificarse como Textura o como Volumen con igual justificación aparente. Elegid una interpretación y razonadla brevemente.'),
+            React.createElement('p', { className: 't-body text-[var(--text-dim)] mt-3 font-semibold' }, AMBIGUOUS_FRAGMENT.credit)
+          )
+        ),
+        !notaEnviada && React.createElement('div', null,
+          React.createElement('div', { className: 'flex gap-3 mb-5 flex-wrap' },
+            ['textura', 'volumen'].map(cat => React.createElement('button', {
+              key: cat,
+              onClick: () => setAmbiguousChoice(cat),
+              'aria-pressed': ambiguousChoice === cat,
+              className: 'mono t-body px-5 py-3 border ' + (ambiguousChoice === cat ? 'border-[var(--gold)] text-[var(--gold)] bg-[var(--gold)]/10' : 'hairline scanline-btn'),
+            }, CATEGORIES[cat].label))
+          ),
+          React.createElement('textarea', {
+            className: 'w-full h-32 bg-[#0a0f1a] border hairline p-3 t-body text-[var(--text-main)] mb-4 resize-none',
+            placeholder: 'Nota de criterio (texto libre, sin corrección automática)…',
+            value: notaCriterio,
+            onChange: e => setNotaCriterio(e.target.value),
+          }),
+          React.createElement('button', {
+            disabled: !ambiguousChoice,
+            className: 'mono t-body font-semibold px-5 py-3 border scanline-btn',
+            onClick: enviarNota,
+          }, 'ARCHIVAR NOTA')
+        ),
+        notaEnviada && !anomaliaVisible && React.createElement('p', { className: 'mono t-body text-[var(--ok)]' }, 'Nota archivada para el informe.')
+      ),
+
+      anomaliaVisible && React.createElement('div', { className: 'mt-2' },
+        React.createElement('p', { className: 'mono t-body text-[var(--ok)] mb-5' }, 'Nota archivada para el informe.'),
+        React.createElement('div', { className: 'border border-[var(--carmin-border)] bg-[var(--bg-panel-2)] p-5 mb-6' },
+          React.createElement('p', { className: 'mono t-body-lg leading-relaxed text-[var(--carmin-text)]' },
+            anomaliaTexto,
+            anomaliaTexto.length < ANOMALY_TEXT.length ? React.createElement('span', { className: 'caret' }, '▌') : null
+          )
+        ),
+        anomaliaTexto.length >= ANOMALY_TEXT.length && React.createElement('div', { className: 'border hairline bg-[var(--bg-panel)] p-5' },
+          React.createElement('p', { className: 'mono t-label text-[var(--gold)] mb-3' }, '✓ SALA COMPLETADA — PIGMENTO OCRE RECUPERADO'),
+          React.createElement('ul', { className: 't-body text-[var(--text-dim)] space-y-2 mb-2' },
+            React.createElement('li', null, `✓ Clasificación completa: ${totalClassified}/${fragments.length}`),
+            React.createElement('li', null, `✓ Encargo del taller satisfecho: ${encargoSatisfecho ? 'sí' : 'no'}`),
+            React.createElement('li', null, '✓ Nota de criterio archivada'),
+            React.createElement('li', null, '✓ Anomalía pigmentaria registrada'),
+          ),
+          React.createElement('div', { className: 'border-2 border-[var(--gold)]/60 bg-black/30 p-5 mt-5 text-center' },
+            React.createElement('p', { className: 't-body text-[var(--text-main)] mb-2' }, 'Vuestro código de sala — anotadlo, lo necesitaréis más adelante:'),
+            React.createElement('p', { className: 'mono t-title tracking-[0.3em] text-[var(--gold)] mb-3' }, codigoSala),
+            React.createElement('button', { className: 'mono t-body px-4 py-2 border hairline scanline-btn', onClick: copiarCodigo }, codigoCopiado ? 'COPIADO ✓' : '📋 copiar código')
+          )
+        )
+      )
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+</script>
+
+<script>
+  (function () {
+    var src = document.getElementById('app-source').textContent;
+    var transformed = Babel.transform(src, { presets: ['react'], filename: 'p3_anatomia_lienzo.js' }).code;
+    var s = document.createElement('script');
+    s.text = transformed;
+    document.body.appendChild(s);
+  })();
+</script>
+</body>
+</html>
